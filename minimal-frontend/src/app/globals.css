@@ -9,7 +9,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #050814;
     --foreground: #ededed;
   }
 }
@@ -17,11 +17,57 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+
+  .glassmorphism {
+    @apply bg-black/30 backdrop-blur-md border border-white/10;
+  }
+
+  .animated-gradient {
+    background: linear-gradient(
+      -45deg,
+      rgba(0, 180, 216, 0.2),
+      rgba(147, 51, 234, 0.2),
+      rgba(101, 163, 13, 0.2),
+      rgba(0, 180, 216, 0.2)
+    );
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+  }
+
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 180, 216, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 180, 216, 0.7);
 }
