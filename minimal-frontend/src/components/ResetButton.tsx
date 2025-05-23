@@ -41,6 +41,10 @@ const ResetButton: React.FC<ResetButtonProps> = ({ onSuccess }) => {
         functionName: "resetArrays",
       });
 
+      if (!publicClient) {
+        throw new Error("Public client not available");
+      }
+
       const tx = await publicClient.waitForTransactionReceipt({ hash: txHash });
 
       if (tx.status === "success") {

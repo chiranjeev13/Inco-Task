@@ -48,7 +48,7 @@ const WealthSubmissionForm: React.FC<WealthSubmissionFormProps> = ({
   const { address } = useAccount();
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
-  const walletClient = useWalletClient();
+  const { data: walletClient } = useWalletClient();
   const { triggerRefetch } = useWealthContext();
 
   // Add participants check
@@ -56,11 +56,11 @@ const WealthSubmissionForm: React.FC<WealthSubmissionFormProps> = ({
     address: PRIVATE_WEALTH_CONTRACT_ADDRESS,
     abi: PrivateWealthABI,
     functionName: "getParticipants",
-  });
+  }) as { data: string[] | undefined };
 
   const hasSubmitted = React.useMemo(() => {
     if (!address || !participants) return false;
-    return participants.includes(address);
+    return participants.includes(address as string);
   }, [address, participants]);
 
   const [amount, setAmount] = useState<string>("");
@@ -105,7 +105,7 @@ const WealthSubmissionForm: React.FC<WealthSubmissionFormProps> = ({
     try {
       const encrypted = await encryptValue({
         value: Number(amount),
-        address,
+        address: address as `0x${string}`,
         contractAddress: PRIVATE_WEALTH_CONTRACT_ADDRESS,
       });
 
@@ -139,7 +139,7 @@ const WealthSubmissionForm: React.FC<WealthSubmissionFormProps> = ({
     setError("");
     setSuccess("");
 
-    if (!address || !walletClient.data) {
+    if (!address || !walletClient) {
       setError("Please connect your wallet to submit wealth.");
       return;
     }
@@ -160,6 +160,11 @@ const WealthSubmissionForm: React.FC<WealthSubmissionFormProps> = ({
       });
 
       setTxHash(txHash);
+
+      if (!publicClient) {
+        throw new Error("Public client not available");
+      }
+
       const tx = await publicClient.waitForTransactionReceipt({ hash: txHash });
 
       if (tx.status === "success") {
@@ -306,23 +311,37 @@ const WealthSubmissionForm: React.FC<WealthSubmissionFormProps> = ({
                     Default: handle → 0 if malformed input
                   </div>
                   <div className="mt-4 border-t border-primary-500/30 pt-3">
-                    <div className="font-mono text-primary-400 text-xs mb-2">COMPONENT FLOW:</div>
+                    <div className="font-mono text-primary-400 text-xs mb-2">
+                      COMPONENT FLOW:
+                    </div>
                     <div className="space-y-2 text-xs">
                       <div className="flex items-start gap-2">
                         <div className="font-mono text-secondary-400">1.</div>
-                        <div>Enter ETH amount → SDK encrypts with your wallet&apos;s context</div>
+                        <div>
+                          Enter ETH amount → SDK encrypts with your
+                          wallet&apos;s context
+                        </div>
                       </div>
                       <div className="flex items-start gap-2">
                         <div className="font-mono text-secondary-400">2.</div>
-                        <div>Click encrypt → Generate unique handle with your address as msg.sender</div>
+                        <div>
+                          Click encrypt → Generate unique handle with your
+                          address as msg.sender
+                        </div>
                       </div>
                       <div className="flex items-start gap-2">
                         <div className="font-mono text-secondary-400">3.</div>
-                        <div>Submit → Contract stores handle in balanceOf[your_address]</div>
+                        <div>
+                          Submit → Contract stores handle in
+                          balanceOf[your_address]
+                        </div>
                       </div>
                       <div className="flex items-start gap-2 pt-1 text-primary-300">
                         <div className="font-mono">→</div>
-                        <div>Only you can decrypt your wealth, but anyone can compare wealth privately</div>
+                        <div>
+                          Only you can decrypt your wealth, but anyone can
+                          compare wealth privately
+                        </div>
                       </div>
                     </div>
                   </div>

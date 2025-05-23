@@ -60,8 +60,11 @@ const OwnWealthDisplay: React.FC = () => {
   }, [wealth]);
 
   const decryptWealth = async (encryptedWealth: string): Promise<string> => {
+    if (!walletClient) {
+      throw new Error("Wallet client not available");
+    }
     const decryptedValue = await reEncryptValue({
-      walletClient: walletClient,
+      walletClient,
       handle: encryptedWealth,
     });
     return decryptedValue;
@@ -181,8 +184,7 @@ const OwnWealthDisplay: React.FC = () => {
                       <div className="flex items-start gap-2 pt-1 text-primary-300">
                         <div className="font-mono">→</div>
                         <div>
-                          Private view: Only you can see your wealth
-                          value
+                          Private view: Only you can see your wealth value
                         </div>
                       </div>
                     </div>

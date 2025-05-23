@@ -75,6 +75,11 @@ const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({
         abi: PrivateWealthABI,
         functionName: "richest",
       });
+
+      if (!publicClient) {
+        throw new Error("Public client not available");
+      }
+
       const tx = await publicClient.waitForTransactionReceipt({ hash: txHash });
 
       if (tx.status === "success") {

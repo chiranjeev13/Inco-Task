@@ -21,7 +21,7 @@ const ParticipantsDisplay: React.FC = () => {
     address: PRIVATE_WEALTH_CONTRACT_ADDRESS,
     abi: PrivateWealthABI,
     functionName: "getParticipants",
-  });
+  }) as { data: string[] | undefined; isLoading: boolean; refetch: () => void };
 
   // Refetch when lastUpdate changes
   useEffect(() => {
@@ -74,7 +74,7 @@ const ParticipantsDisplay: React.FC = () => {
             </div>
             <h2 className="text-xl font-mono font-bold text-secondary-400">
               Participants
-           </h2>
+            </h2>
             <Tooltip content="View all users who have submitted their wealth data">
               <HelpCircle
                 className="text-secondary-400/50 hover:text-secondary-400 transition-colors cursor-help"
