@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { useState, useEffect, ReactNode } from "react";
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
-import { anvil, baseSepolia } from "wagmi/chains";
+import { baseSepolia } from "wagmi/chains";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { Config } from "wagmi";
 
@@ -20,10 +20,10 @@ const initializeWeb3Modal = (): Config => {
       icons: ["https://avatars.githubusercontent.com/u/37784886"],
     };
 
-    const chains = [anvil, baseSepolia];
+    const chains = [baseSepolia];
 
     const wagmiConfig = defaultWagmiConfig({
-      chains: [anvil, baseSepolia],
+      chains: [baseSepolia],
       projectId,
       metadata,
     });

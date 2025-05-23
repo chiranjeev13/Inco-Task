@@ -77,7 +77,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({ onSuccess }) => {
             <Trash2 className="text-red-400" size={24} />
           </div>
           <h2 className="text-xl font-mono font-bold text-red-400">
-            SYSTEM RESET
+            System Reset
           </h2>
           <Tooltip content="Reset all submitted wealth data and clear the leaderboard. This action cannot be undone.">
             <HelpCircle

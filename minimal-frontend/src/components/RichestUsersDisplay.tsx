@@ -27,6 +27,12 @@ interface RichestUsersDisplayProps {
   onRefresh?: () => void;
 }
 
+const tooltipVariants = {
+  initial: { opacity: 0, scale: 0.95 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.95 },
+};
+
 const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({
   onRefresh,
 }) => {
@@ -120,16 +126,93 @@ const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({
               <Trophy className="text-primary-400" size={24} />
             </div>
             <h2 className="text-xl font-mono font-bold text-primary-400">
-              WEALTH LEADERBOARD
+              Wealth Leaderboard
             </h2>
-            <Tooltip content="View the wealthiest users in the network while maintaining privacy">
+            <Tooltip
+              content={
+                <motion.div
+                  variants={tooltipVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  className="text-sm p-4 space-y-3 max-w-[400px]"
+                >
+                  <div className="space-y-3 text-left">
+                    <div className="font-mono text-primary-400 border-b border-primary-500/30 pb-2">
+                      Asynchronous Winner Calculation
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2">
+                        <div className="font-mono text-secondary-400">req:</div>
+                        <div>
+                          <code className="text-primary-300">
+                            isGreaterOrEqual.requestDecryption(
+                            this.resultCallback.selector, abi.encode(address) )
+                          </code>
+                          <div className="text-xs text-gray-400 mt-1">
+                            Contract requests co-validator to decrypt equality
+                            results
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <div className="font-mono text-secondary-400">cb:</div>
+                        <div>
+                          <code className="text-primary-300">
+                            resultCallback(requestId, result, data)
+                          </code>
+                          <div className="text-xs text-gray-400 mt-1">
+                            Co-validator processes in TEE and calls back with
+                            winner data
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4 border-t border-primary-500/30 pt-3">
+                      <div className="font-mono text-primary-400 text-xs mb-2">
+                        BACKGROUND PROCESS:
+                      </div>
+                      <div className="space-y-2 text-xs">
+                        <div className="flex items-start gap-2">
+                          <div className="font-mono text-secondary-400">1.</div>
+                          <div>
+                            Contract emits decryption requests for each
+                            potential winner
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <div className="font-mono text-secondary-400">2.</div>
+                          <div>
+                            Co-validator securely processes in Trusted Execution
+                            Environment
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <div className="font-mono text-secondary-400">3.</div>
+                          <div>
+                            Results arrive in subsequent blocks via callback
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2 pt-1 text-primary-300">
+                          <div className="font-mono">⏳</div>
+                          <div>
+                            Please wait a few moments for winners to be
+                            populated
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              }
+            >
               <HelpCircle
                 className="text-primary-400/50 hover:text-primary-400 transition-colors cursor-help"
                 size={20}
               />
             </Tooltip>
           </div>
-          <Tooltip content="Calculate and update the current wealthiest users">
+          <Tooltip content="Trigger homomorphic comparison of encrypted handles: F(a) > F(b) ⟺ a > b, preserving ordering while maintaining privacy">
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
@@ -195,8 +278,8 @@ const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({
                     <Tooltip
                       content={
                         winners.length === 1 || idx === 0
-                          ? "Top Wealth Holder"
-                          : "Shared Top Position"
+                          ? "Highest encrypted wealth handle: max(F(wealth₁), F(wealth₂), ...)"
+                          : "Equal encrypted wealth handles: F(wealth₁) = F(wealth₂)"
                       }
                     >
                       {winners.length === 1 || idx === 0 ? (

@@ -2,15 +2,22 @@
 pragma solidity ^0.8.28;
 
 import {e, ebool, euint256} from "@inco/lightning/src/Lib.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract PrivateWealth {
+contract PrivateWealth is Ownable {
     mapping(address => euint256) private participantWealth;
     mapping(address => bool) isCounted;
+
+    address public coValidator;
     address[] public participants;
     address[] public winners;
     euint256 public maxWealth;
 
     using e for *;
+
+    constructor(address _coValidator) Ownable(msg.sender) {
+        coValidator = _coValidator;
+    }
 
     function submitWealth(bytes memory eAmount) public {
         require(!isCounted[msg.sender], "Already Amount Added");
@@ -54,7 +61,15 @@ contract PrivateWealth {
         bool result,
         bytes memory data
     ) external {
+        require(msg.sender == coValidator, "Only co-validator can call");
+
         if (result) {
+            require(isCounted[abi.decode(data, (address))], "Not counted");
+            for (uint256 i = 0; i < winners.length; i++) {
+                if (winners[i] == abi.decode(data, (address))) {
+                    return;
+                }
+            }
             winners.push(abi.decode(data, (address)));
         }
     }
@@ -82,6 +97,10 @@ contract PrivateWealth {
 
     function getParticipants() public view returns (address[] memory) {
         return participants;
+    }
+
+    function updateCoValidator(address _coValidator) public onlyOwner {
+        coValidator = _coValidator;
     }
 
     function getWealthbyUser() public view returns (euint256) {

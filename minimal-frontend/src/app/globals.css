@@ -16,7 +16,8 @@
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background: url("/bg.svg") no-repeat center center fixed;
+  background-size: cover;
   font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
 }
 

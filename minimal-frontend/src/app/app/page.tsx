@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { LogOut, User, Shield } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import WealthSubmissionForm from "../../components/WealthSubmissionForm";
 import OwnWealthDisplay from "../../components/OwnWealthDisplay";
 import RichestUsersDisplay from "../../components/RichestUsersDisplay";
@@ -31,22 +32,23 @@ export default function AppPage() {
         <div className="container mx-auto px-6 py-6">
           <header className="flex justify-between items-center">
             <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-white text-sm font-mono">Powered by</span>
+                <Image
+                  src="/inco_logo.svg"
+                  alt="Inco Logo"
+                  width={100}
+                  height={40}
+                />
+              </div>
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5, type: "spring" }}
-                className="p-2 bg-primary-500/10 rounded-lg border border-primary-500/30"
+                className="p-2 bg-primary-500/10 rounded-lg border border-primary-500/30 ml-4"
               >
                 <Shield className="text-primary-400" size={24} />
               </motion.div>
-              <motion.h1
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-3xl font-mono font-bold bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent"
-              >
-                PRIVATEWEALTH
-              </motion.h1>
             </div>
             <motion.div
               initial={{ y: -10, opacity: 0 }}

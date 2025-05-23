@@ -73,8 +73,8 @@ const ParticipantsDisplay: React.FC = () => {
               <Users className="text-secondary-400" size={24} />
             </div>
             <h2 className="text-xl font-mono font-bold text-secondary-400">
-              PARTICIPANTS
-            </h2>
+              Participants
+           </h2>
             <Tooltip content="View all users who have submitted their wealth data">
               <HelpCircle
                 className="text-secondary-400/50 hover:text-secondary-400 transition-colors cursor-help"

@@ -12,6 +12,13 @@ import { reEncryptValue } from "../utils/inco-lite";
 import { Tooltip } from "./Tooltip";
 import { useWealthContext } from "../provider/WealthProvider";
 
+// Add tooltip animation variants
+const tooltipVariants = {
+  initial: { opacity: 0, scale: 0.95 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.95 },
+};
+
 const OwnWealthDisplay: React.FC = () => {
   const { address } = useAccount();
   const [copied, setCopied] = useState(false);
@@ -102,9 +109,88 @@ const OwnWealthDisplay: React.FC = () => {
             <Eye className="text-primary-400" size={24} />
           </div>
           <h2 className="text-xl font-mono font-bold text-primary-400">
-            YOUR ENCRYPTED WEALTH
+            Your Encrypted Wealth (Handle ID)
           </h2>
-          <Tooltip content="View your submitted wealth in both encrypted and decrypted forms. The decryption process is secure and only accessible by you.">
+          <Tooltip
+            content={
+              <motion.div
+                variants={tooltipVariants}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="text-sm p-4 space-y-3 max-w-[400px]"
+              >
+                <div className="space-y-3 text-left">
+                  <div className="font-mono text-primary-400 border-b border-primary-500/30 pb-2">
+                    Wealth Handle Reencryption
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <div className="font-mono text-secondary-400">
+                        handle:
+                      </div>
+                      <div>
+                        <code className="text-primary-300">
+                          participantWealth[msg.sender] → euint256
+                        </code>
+                        <div className="text-xs text-gray-400 mt-1">
+                          Your encrypted wealth stored onchain
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="font-mono text-secondary-400">auth:</div>
+                      <div>
+                        <code className="text-primary-300">
+                          msg.sender.isAllowed(handle) ✓
+                        </code>
+                        <div className="text-xs text-gray-400 mt-1">
+                          Access control validation in contract
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <div className="font-mono text-secondary-400">reenc:</div>
+                      <div>
+                        <code className="text-primary-300">
+                          EIP-712(ephemPubKey) → plaintext
+                        </code>
+                        <div className="text-xs text-gray-400 mt-1">
+                          Secure reencryption using ephemeral keys
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 border-t border-primary-500/30 pt-3">
+                    <div className="font-mono text-primary-400 text-xs mb-2">
+                      VIEW FLOW:
+                    </div>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex items-start gap-2">
+                        <div className="font-mono text-secondary-400">1.</div>
+                        <div>Generate ephemeral keypair client-side</div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <div className="font-mono text-secondary-400">2.</div>
+                        <div>Sign EIP-712 for secure reencryption request</div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <div className="font-mono text-secondary-400">3.</div>
+                        <div>Decrypt privately using ephemeral private key</div>
+                      </div>
+                      <div className="flex items-start gap-2 pt-1 text-primary-300">
+                        <div className="font-mono">→</div>
+                        <div>
+                          Private view: Only you can see your wealth
+                          value
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            }
+          >
             <HelpCircle
               className="text-primary-400/50 hover:text-primary-400 transition-colors cursor-help"
               size={20}
@@ -123,13 +209,15 @@ const OwnWealthDisplay: React.FC = () => {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className="text-gray-400 font-mono text-sm">
-                    {showDecrypted ? "DECRYPTED VALUE" : "ENCRYPTED VALUE"}
+                    {showDecrypted
+                      ? "DECRYPTED VALUE"
+                      : "ENCRYPTED VALUE (HANDLE ID)"}
                   </span>
                   <Tooltip
                     content={
                       showDecrypted
-                        ? "This is your actual wealth value, decrypted securely using your wallet."
-                        : "This is your encrypted wealth as stored on the blockchain. The encryption ensures privacy while allowing for secure comparisons."
+                        ? "Private decryption using ephemeral keys - F⁻¹(reenc(handle)) → plaintext"
+                        : "Encrypted handle from contract - participantWealth[msg.sender]"
                     }
                   >
                     <HelpCircle

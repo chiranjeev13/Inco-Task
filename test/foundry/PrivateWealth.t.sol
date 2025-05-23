@@ -12,7 +12,8 @@ contract PrivateWealthTest is IncoTest {
 
     function setUp() public override {
         super.setUp();
-        pvtW = new PrivateWealth();
+        address coValidator = address(0x63D8135aF4D393B1dB43B649010c8D3EE19FC9fd);
+        pvtW = new PrivateWealth(coValidator);
     }
 
     function _submitWealth(address participant, uint256 amount) internal {
@@ -219,6 +220,37 @@ contract PrivateWealthTest is IncoTest {
             aliceWealth,
             "Decrypted wealth should match submitted amount"
         );
+    }
+
+    function test_AccessControl_CoValidatorCanAccessUserWealth() public {
+        uint256 aliceWealth = 200;
+        _submitWealth(alice, aliceWealth);
+
+        vm.prank(pvtW.coValidator());
+        vm.expectRevert("Not Allowed to fetch");
+        pvtW.getWealthbyUser();
+    }
+
+    function test_AccessControl_resultCallback_coValidator() public {
+        uint256 aliceWealth = 200;
+        _submitWealth(alice, aliceWealth);
+
+        vm.prank(pvtW.coValidator());
+        pvtW.resultCallback(0, true, abi.encode(alice));
+        processAllOperations();
+
+        address[] memory winners = pvtW.getWinners();
+        assertEq(winners.length, 1, "Should have 1 winner");
+        assertEq(winners[0], alice, "Alice should be the winner");
+    }
+
+    function test_AccessControl_resultCallback_Not_coValidator() public {
+        uint256 aliceWealth = 200;
+        _submitWealth(alice, aliceWealth);
+
+        vm.prank(alice);
+        vm.expectRevert("Only co-validator can call");
+        pvtW.resultCallback(0, true, abi.encode(alice));
     }
 
     function resultCallback(address participant, uint256 wealth) public {
