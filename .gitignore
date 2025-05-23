@@ -6,6 +6,7 @@ out
 # Hardhat files
 /cache
 /artifacts
+/lib
 
 # TypeChain files
 /typechain
