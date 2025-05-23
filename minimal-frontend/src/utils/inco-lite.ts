@@ -13,7 +13,7 @@ interface IncoConfig {
 }
 
 export const getConfig = (): IncoConfig => {
-  return Lightning.localNode() as IncoConfig;
+  return Lightning.baseSepoliaTestnet() as IncoConfig;
 };
 
 interface EncryptValueParams {

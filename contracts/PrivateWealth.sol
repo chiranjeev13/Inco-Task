@@ -80,7 +80,11 @@ contract PrivateWealth {
         return winners;
     }
 
-    function getWealthbyUser() public view returns (euint256){
+    function getParticipants() public view returns (address[] memory) {
+        return participants;
+    }
+
+    function getWealthbyUser() public view returns (euint256) {
         require((msg.sender).isAllowed(participantWealth[msg.sender]), "Not Allowed to fetch");
         return participantWealth[msg.sender];
     }

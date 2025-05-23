@@ -1,18 +1,43 @@
 import React, { useState, useEffect } from "react";
-import { useAccount, useWriteContract, useReadContract, usePublicClient } from "wagmi";
-import { PRIVATE_WEALTH_CONTRACT_ADDRESS, PrivateWealthABI } from "../utils/contract";
-import { Users, RefreshCw, Shield, Lock, Trophy, Crown, Award, Scale } from "lucide-react";
+import {
+  useAccount,
+  useWriteContract,
+  useReadContract,
+  usePublicClient,
+} from "wagmi";
+import {
+  PRIVATE_WEALTH_CONTRACT_ADDRESS,
+  PrivateWealthABI,
+} from "../utils/contract";
+import {
+  Users,
+  RefreshCw,
+  Shield,
+  Lock,
+  Trophy,
+  Crown,
+  Award,
+  Scale,
+  HelpCircle,
+} from "lucide-react";
 import { motion } from "framer-motion";
+import { Tooltip } from "./Tooltip";
 
 interface RichestUsersDisplayProps {
   onRefresh?: () => void;
 }
 
-const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({ onRefresh }) => {
+const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({
+  onRefresh,
+}) => {
   const { address } = useAccount();
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
-  const { data: winners, refetch, isLoading: isWinnersLoading } = useReadContract({
+  const {
+    data: winners,
+    refetch,
+    isLoading: isWinnersLoading,
+  } = useReadContract({
     address: PRIVATE_WEALTH_CONTRACT_ADDRESS,
     abi: PrivateWealthABI,
     functionName: "getWinners",
@@ -22,7 +47,7 @@ const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({ onRefresh }) 
 
   // Log winners whenever they change
   useEffect(() => {
-    console.log('Winners:', winners);
+    console.log("Winners:", winners);
   }, [winners]);
 
   // Poll for winners every 2 seconds
@@ -45,7 +70,7 @@ const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({ onRefresh }) 
         functionName: "richest",
       });
       const tx = await publicClient.waitForTransactionReceipt({ hash: txHash });
-      
+
       if (tx.status === "success") {
         await refetch();
         if (onRefresh) onRefresh();
@@ -61,22 +86,22 @@ const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({ onRefresh }) 
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
+        delayChildren: 0.2,
+      },
+    },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 }
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="relative glassmorphism rounded-xl p-6 shadow-2xl overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -84,7 +109,7 @@ const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({ onRefresh }) 
     >
       {/* Animated background elements */}
       <div className="absolute inset-0 bg-grid-pattern opacity-20"></div>
-      
+
       {/* Glow effect */}
       <div className="absolute inset-0 animated-gradient opacity-20"></div>
 
@@ -97,17 +122,27 @@ const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({ onRefresh }) 
             <h2 className="text-xl font-mono font-bold text-primary-400">
               WEALTH LEADERBOARD
             </h2>
+            <Tooltip content="View the wealthiest users in the network while maintaining privacy">
+              <HelpCircle
+                className="text-primary-400/50 hover:text-primary-400 transition-colors cursor-help"
+                size={20}
+              />
+            </Tooltip>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleFindRichest}
-            className="p-2 bg-primary-500/10 hover:bg-primary-500/20 rounded-lg border border-primary-500/30 transition-all duration-200 hover:shadow-neon"
-            disabled={loading}
-            title="Find Richest"
-          >
-            <RefreshCw className={`text-primary-400 ${loading ? "animate-spin" : ""}`} size={20} />
-          </motion.button>
+          <Tooltip content="Calculate and update the current wealthiest users">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleFindRichest}
+              className="p-2 bg-primary-500/10 hover:bg-primary-500/20 rounded-lg border border-primary-500/30 transition-all duration-200 hover:shadow-neon"
+              disabled={loading}
+            >
+              <RefreshCw
+                className={`text-primary-400 ${loading ? "animate-spin" : ""}`}
+                size={20}
+              />
+            </motion.button>
+          </Tooltip>
         </div>
 
         {loading || isWinnersLoading ? (
@@ -118,10 +153,12 @@ const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({ onRefresh }) 
                 <Lock className="text-primary-400" size={24} />
               </div>
             </div>
-            <p className="text-primary-400 font-mono animate-pulse">CALCULATING WINNERS...</p>
+            <p className="text-primary-400 font-mono animate-pulse">
+              CALCULATING WINNERS...
+            </p>
           </div>
         ) : error ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-2 p-3 text-red-400 bg-red-900/20 border border-red-500/30 rounded-lg text-sm font-mono"
@@ -131,7 +168,7 @@ const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({ onRefresh }) 
         ) : Array.isArray(winners) && winners.length > 0 ? (
           <>
             {winners.length > 1 && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="flex items-center gap-2 p-3 mb-4 bg-secondary-500/10 border border-secondary-500/30 rounded-lg text-sm"
@@ -142,35 +179,43 @@ const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({ onRefresh }) 
                 </span>
               </motion.div>
             )}
-            <motion.div 
+            <motion.div
               variants={containerVariants}
               initial="hidden"
               animate="visible"
               className="space-y-3 mt-2"
             >
-            {winners.map((winner: string, idx: number) => (
+              {winners.map((winner: string, idx: number) => (
                 <motion.div
-                key={winner} 
+                  key={winner}
                   variants={itemVariants}
                   className="group flex items-center justify-between p-3 bg-black/50 rounded-lg border border-primary-500/30 hover:border-primary-500/50 transition-all duration-200"
-              >
-                <div className="flex items-center gap-3">
-                    {winners.length === 1 || idx === 0 ? (
-                      <Crown className="text-yellow-400" size={18} />
-                    ) : (
-                      <Award className="text-yellow-300" size={18} />
-                    )}
+                >
+                  <div className="flex items-center gap-3">
+                    <Tooltip
+                      content={
+                        winners.length === 1 || idx === 0
+                          ? "Top Wealth Holder"
+                          : "Shared Top Position"
+                      }
+                    >
+                      {winners.length === 1 || idx === 0 ? (
+                        <Crown className="text-yellow-400" size={18} />
+                      ) : (
+                        <Award className="text-yellow-300" size={18} />
+                      )}
+                    </Tooltip>
                     <code className="text-gray-300 font-mono text-sm group-hover:text-primary-300 transition-colors">
-                    {winner.slice(0, 6)}...{winner.slice(-4)}
-                  </code>
-                </div>
+                      {winner.slice(0, 6)}...{winner.slice(-4)}
+                    </code>
+                  </div>
                   <div className="px-2 py-1 bg-primary-500/10 rounded border border-primary-500/30">
                     <span className="text-primary-400 text-xs font-mono">
                       {winners.length === 1 ? "WINNER" : "SHARED TOP"}
                     </span>
-                </div>
+                  </div>
                 </motion.div>
-            ))}
+              ))}
             </motion.div>
           </>
         ) : (
@@ -178,7 +223,8 @@ const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({ onRefresh }) 
             <Shield size={24} className="opacity-50" />
             <span className="font-mono">NO WINNERS YET</span>
             <p className="text-xs text-center max-w-xs opacity-70">
-              Click the refresh button to find the wealthiest users in the network
+              Click the refresh button to find the wealthiest users in the
+              network
             </p>
           </div>
         )}
@@ -187,4 +233,4 @@ const RichestUsersDisplay: React.FC<RichestUsersDisplayProps> = ({ onRefresh }) 
   );
 };
 
-export default RichestUsersDisplay; 
+export default RichestUsersDisplay;

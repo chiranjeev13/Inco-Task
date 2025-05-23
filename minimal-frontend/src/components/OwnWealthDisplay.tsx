@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAccount, useReadContract, useWalletClient } from "wagmi";
 import {
   PRIVATE_WEALTH_CONTRACT_ADDRESS,
   PrivateWealthABI,
 } from "../utils/contract";
-import { Lock, Eye, Coins, Copy, Check } from "lucide-react";
+import { Lock, Eye, Coins, Copy, Check, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { reEncryptValue } from "../utils/inco-lite";
+import { Tooltip } from "./Tooltip";
+import { useWealthContext } from "../provider/WealthProvider";
 
 const OwnWealthDisplay: React.FC = () => {
   const { address } = useAccount();
@@ -17,13 +19,38 @@ const OwnWealthDisplay: React.FC = () => {
   const [decryptedValue, setDecryptedValue] = useState<string>("");
   const [isDecrypting, setIsDecrypting] = useState(false);
   const { data: walletClient } = useWalletClient();
+  const { lastUpdate } = useWealthContext();
 
-  const { data: wealth, isLoading } = useReadContract({
+  const {
+    data: wealth,
+    isLoading,
+    refetch,
+  } = useReadContract({
     address: PRIVATE_WEALTH_CONTRACT_ADDRESS,
     abi: PrivateWealthABI,
     functionName: "getWealthbyUser",
     account: address,
   });
+
+  // Refetch when lastUpdate changes
+  useEffect(() => {
+    refetch();
+  }, [lastUpdate, refetch]);
+
+  // Add continuous polling every 2 seconds
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      refetch();
+    }, 200);
+
+    return () => clearInterval(intervalId);
+  }, [refetch]);
+
+  // Reset decrypted value when wealth changes
+  useEffect(() => {
+    setDecryptedValue("");
+    setShowDecrypted(false);
+  }, [wealth]);
 
   const decryptWealth = async (encryptedWealth: string): Promise<string> => {
     const decryptedValue = await reEncryptValue({
@@ -77,16 +104,15 @@ const OwnWealthDisplay: React.FC = () => {
           <h2 className="text-xl font-mono font-bold text-primary-400">
             YOUR ENCRYPTED WEALTH
           </h2>
+          <Tooltip content="View your submitted wealth in both encrypted and decrypted forms. The decryption process is secure and only accessible by you.">
+            <HelpCircle
+              className="text-primary-400/50 hover:text-primary-400 transition-colors cursor-help"
+              size={20}
+            />
+          </Tooltip>
         </div>
 
-        {isLoading || isDecrypting ? (
-          <div className="h-16 flex items-center gap-2 text-primary-400 font-mono animate-pulse">
-            <Lock size={16} />
-            <span>
-              {isDecrypting ? "DECRYPTING WEALTH..." : "LOADING WEALTH..."}
-            </span>
-          </div>
-        ) : wealth ? (
+        {wealth ? (
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -95,28 +121,52 @@ const OwnWealthDisplay: React.FC = () => {
           >
             <div className="p-5 bg-black/50 rounded-lg border border-primary-500/30">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-400 font-mono text-sm">
-                  {showDecrypted ? "DECRYPTED VALUE" : "ENCRYPTED VALUE"}
-                </span>
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={toggleDecryption}
-                    className="p-1.5 hover:bg-primary-500/20 rounded transition-colors"
-                    title={showDecrypted ? "Show Encrypted" : "Show Decrypted"}
+                  <span className="text-gray-400 font-mono text-sm">
+                    {showDecrypted ? "DECRYPTED VALUE" : "ENCRYPTED VALUE"}
+                  </span>
+                  <Tooltip
+                    content={
+                      showDecrypted
+                        ? "This is your actual wealth value, decrypted securely using your wallet."
+                        : "This is your encrypted wealth as stored on the blockchain. The encryption ensures privacy while allowing for secure comparisons."
+                    }
                   >
-                    <Lock className="text-primary-400" size={16} />
-                  </button>
-                  <button
-                    onClick={handleCopy}
-                    className="p-1.5 hover:bg-primary-500/20 rounded transition-colors"
-                    title="Copy to clipboard"
+                    <HelpCircle
+                      className="text-primary-400/50 hover:text-primary-400 transition-colors cursor-help"
+                      size={14}
+                    />
+                  </Tooltip>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Tooltip
+                    content="Click to toggle between encrypted and decrypted views"
+                    side="left"
                   >
-                    {copied ? (
-                      <Check className="text-green-400" size={16} />
-                    ) : (
-                      <Copy className="text-primary-400" size={16} />
-                    )}
-                  </button>
+                    <button
+                      onClick={toggleDecryption}
+                      className="p-1.5 hover:bg-primary-500/20 rounded transition-colors"
+                    >
+                      <Lock className="text-primary-400" size={16} />
+                    </button>
+                  </Tooltip>
+                  <Tooltip
+                    content={`Copy the ${
+                      showDecrypted ? "decrypted" : "encrypted"
+                    } value to clipboard`}
+                    side="left"
+                  >
+                    <button
+                      onClick={handleCopy}
+                      className="p-1.5 hover:bg-primary-500/20 rounded transition-colors"
+                    >
+                      {copied ? (
+                        <Check className="text-green-400" size={16} />
+                      ) : (
+                        <Copy className="text-primary-400" size={16} />
+                      )}
+                    </button>
+                  </Tooltip>
                 </div>
               </div>
               <div className="flex items-center gap-2 overflow-hidden">

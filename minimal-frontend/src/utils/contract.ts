@@ -1,7 +1,7 @@
-import PrivateWealthabi from "../../../artifacts/contracts/PrivateWealth.sol/PrivateWealth.json";
+import PrivateWealthabi from "../../../artifacts/contracts/PrivateWealth.sol/PrivateWealth.json" assert { type: "json" };
 
 export const PRIVATE_WEALTH_CONTRACT_ADDRESS =
-  "0x5FbDB2315678afecb367f032d93F642f64180aa3" as `0x${string}`;
+  "0xCbe84351aEb9D4bc5fCa9ff72b0208D2c99CDF85" as `0x${string}`;
 
 
 export const PrivateWealthABI = PrivateWealthabi.abi;

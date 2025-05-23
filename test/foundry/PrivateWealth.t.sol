@@ -3,11 +3,12 @@ pragma solidity ^0.8;
 
 import {IncoTest} from "../../node_modules/@inco/lightning/src/test/IncoTest.sol";
 import {PrivateWealth} from "../../contracts/PrivateWealth.sol";
-import {euint256} from "@inco/lightning/src/Lib.sol";
+import {e, ebool, euint256} from "@inco/lightning/src/Lib.sol";
 import "forge-std/console.sol";
 
 contract PrivateWealthTest is IncoTest {
     PrivateWealth pvtW;
+    using e for *;
 
     function setUp() public override {
         super.setUp();
@@ -124,7 +125,6 @@ contract PrivateWealthTest is IncoTest {
     }
 
     function test_GetWealthByUser() public {
-
         uint256 aliceWealth = 200;
 
         _submitWealth(alice, aliceWealth);
@@ -146,7 +146,6 @@ contract PrivateWealthTest is IncoTest {
     }
 
     function test_GetWealthByUserAfterReset() public {
-
         uint256 initialWealth = 200;
         _submitWealth(alice, initialWealth);
 
@@ -155,5 +154,74 @@ contract PrivateWealthTest is IncoTest {
         vm.prank(alice);
         vm.expectRevert("Not Allowed to fetch");
         pvtW.getWealthbyUser();
+    }
+
+    function test_AccessControl_ContractCannotAccessUserWealth() public {
+        uint256 aliceWealth = 200;
+        _submitWealth(alice, aliceWealth);
+
+        vm.prank(address(pvtW));
+        vm.expectRevert("Not Allowed to fetch");
+        pvtW.getWealthbyUser();
+    }
+
+    function test_AccessControl_UserCanAccessOwnWealth() public {
+        uint256 aliceWealth = 200;
+        _submitWealth(alice, aliceWealth);
+
+        vm.prank(alice);
+        euint256 result = pvtW.getWealthbyUser();
+        processAllOperations();
+        uint256 decryptedWealth = getUint256Value(result);
+
+        assertEq(
+            decryptedWealth,
+            aliceWealth,
+            "User should be able to access their own wealth"
+        );
+    }
+
+    function test_AccessControl_UserCannotAccessOtherUserWealth() public {
+        uint256 aliceWealth = 200;
+        _submitWealth(alice, aliceWealth);
+
+        vm.prank(bob);
+        vm.expectRevert("Not Allowed to fetch");
+        pvtW.getWealthbyUser();
+    }
+
+    function test_AccessControl_OwnerCannotAccessUserWealth() public {
+        uint256 aliceWealth = 200;
+        _submitWealth(alice, aliceWealth);
+
+        vm.prank(owner);
+        vm.expectRevert("Not Allowed to fetch");
+        pvtW.getWealthbyUser();
+    }
+
+    function test_AccessControl_DecryptionRequestHandling() public {
+        uint256 aliceWealth = 200;
+        _submitWealth(alice, aliceWealth);
+
+        vm.prank(alice);
+        euint256 result = pvtW.getWealthbyUser();
+
+        vm.prank(address(pvtW));
+        result.requestDecryption(
+            this.resultCallback.selector,
+            abi.encode(alice)
+        );
+        processAllOperations();
+        uint256 decryptedWealth = getUint256Value(result);
+
+        assertEq(
+            decryptedWealth,
+            aliceWealth,
+            "Decrypted wealth should match submitted amount"
+        );
+    }
+
+    function resultCallback(address participant, uint256 wealth) public {
+        console.log("resultCallback", participant, wealth);
     }
 }

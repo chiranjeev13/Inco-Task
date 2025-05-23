@@ -2,9 +2,14 @@
 
 import React, { useState } from "react";
 import { useWriteContract, usePublicClient } from "wagmi";
-import { PRIVATE_WEALTH_CONTRACT_ADDRESS, PrivateWealthABI } from "../utils/contract";
-import { RefreshCw, AlertTriangle, Trash2 } from "lucide-react";
+import {
+  PRIVATE_WEALTH_CONTRACT_ADDRESS,
+  PrivateWealthABI,
+} from "../utils/contract";
+import { RefreshCw, AlertTriangle, Trash2, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { Tooltip } from "./Tooltip";
+import { useWealthContext } from "../provider/WealthProvider";
 
 interface ResetButtonProps {
   onSuccess?: () => void;
@@ -15,9 +20,14 @@ const ResetButton: React.FC<ResetButtonProps> = ({ onSuccess }) => {
   const publicClient = usePublicClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const { triggerRefetch } = useWealthContext();
 
   const handleReset = async () => {
-    if (!confirm("Are you sure you want to reset the entire system? This action cannot be undone.")) {
+    if (
+      !confirm(
+        "Are you sure you want to reset the entire system? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
@@ -32,9 +42,12 @@ const ResetButton: React.FC<ResetButtonProps> = ({ onSuccess }) => {
       });
 
       const tx = await publicClient.waitForTransactionReceipt({ hash: txHash });
-      
+
       if (tx.status === "success") {
+        triggerRefetch();
         if (onSuccess) onSuccess();
+        // Reload the page after successful reset
+        window.location.reload();
       } else {
         setError("Reset failed");
       }
@@ -46,7 +59,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({ onSuccess }) => {
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="relative glassmorphism rounded-xl p-6 shadow-2xl overflow-hidden border border-red-500/30"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -54,7 +67,7 @@ const ResetButton: React.FC<ResetButtonProps> = ({ onSuccess }) => {
     >
       {/* Animated background elements */}
       <div className="absolute inset-0 bg-grid-pattern opacity-20"></div>
-      
+
       {/* Glow effect */}
       <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-red-500/5 to-red-500/10 animate-pulse"></div>
 
@@ -66,10 +79,16 @@ const ResetButton: React.FC<ResetButtonProps> = ({ onSuccess }) => {
           <h2 className="text-xl font-mono font-bold text-red-400">
             SYSTEM RESET
           </h2>
+          <Tooltip content="Reset all submitted wealth data and clear the leaderboard. This action cannot be undone.">
+            <HelpCircle
+              className="text-red-400/50 hover:text-red-400 transition-colors cursor-help"
+              size={20}
+            />
+          </Tooltip>
         </div>
 
         {error && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-2 p-3 text-red-400 bg-red-900/20 border border-red-500/30 rounded-lg text-sm font-mono mb-4"
@@ -79,26 +98,28 @@ const ResetButton: React.FC<ResetButtonProps> = ({ onSuccess }) => {
           </motion.div>
         )}
 
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={handleReset}
-          className="w-full py-4 bg-gradient-to-r from-red-600/30 to-red-700/30 hover:from-red-600/40 hover:to-red-700/40 text-red-400 border border-red-500/30 rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-mono"
-          disabled={loading}
-        >
-          {loading ? (
-            <>
-              <RefreshCw size={20} className="animate-spin" />
-              <span>RESETTING...</span>
-            </>
-          ) : (
-            <>
-              <Trash2 size={20} />
-              <span>RESET SYSTEM</span>
-            </>
-          )}
-        </motion.button>
-        
+        <Tooltip content="Warning: This will permanently delete all submitted wealth data">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleReset}
+            className="w-full py-4 bg-gradient-to-r from-red-600/30 to-red-700/30 hover:from-red-600/40 hover:to-red-700/40 text-red-400 border border-red-500/30 rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-mono"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <RefreshCw size={20} className="animate-spin" />
+                <span>RESETTING...</span>
+              </>
+            ) : (
+              <>
+                <Trash2 size={20} />
+                <span>RESET SYSTEM</span>
+              </>
+            )}
+          </motion.button>
+        </Tooltip>
+
         <p className="mt-4 text-xs text-gray-400 text-center">
           This will clear all submitted wealth data and reset the leaderboard
         </p>
@@ -107,4 +128,4 @@ const ResetButton: React.FC<ResetButtonProps> = ({ onSuccess }) => {
   );
 };
 
-export default ResetButton; 
+export default ResetButton;
