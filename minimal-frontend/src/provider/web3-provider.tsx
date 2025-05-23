@@ -81,7 +81,7 @@ export function Web3Provider({ children, initialState }: Web3ProviderProps) {
         <p className="text-xl mb-2">
           {error
             ? "Wallet Connection Error"
-            : "Initializing Wallet Connection..."}
+            : "Privacy for all..."}
         </p>
         {error && (
           <div className="bg-red-900/20 border border-red-500 text-red-400 p-4 rounded-lg mt-4 flex items-center justify-center">
@@ -106,4 +106,4 @@ export function Web3Provider({ children, initialState }: Web3ProviderProps) {
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
   );
-} 
+}

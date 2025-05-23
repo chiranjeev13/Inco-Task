@@ -154,7 +154,7 @@ export default function LandingPage() {
                 </div>
               </motion.div>
 
-              {renderTypingText("Yao's Problem of Millionaires")}
+              {renderTypingText("Yao's Problem of Millionaire's")}
 
               {/* Features */}
               <motion.div
@@ -184,15 +184,15 @@ export default function LandingPage() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => router.push("/app")}
-                  className="flex items-center gap-2 px-8 py-4 bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 border border-primary-500/30 rounded-lg transition-all duration-200 hover:shadow-neon"
+                  className="flex items-center gap-2 px-8 py-4 bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 border border-primary-500/30 rounded-lg transition-all duration-200 hover:shadow-neon font-mono"
                 >
-                  <span>LAUNCH APP</span>
+                  <span>L0UnCh ÁpP</span>
                   <ArrowRight size={20} />
                 </motion.button>
               ) : (
                 <button
                   onClick={() => open()}
-                  className="flex items-center gap-2 px-8 py-4 bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 border border-primary-500/30 rounded-lg transition-all duration-200 hover:shadow-neon"
+                  className="flex items-center gap-2 px-8 py-4 bg-primary-500/10 hover:bg-primary-500/20 text-primary-400 border border-primary-500/30 rounded-lg transition-all duration-200 hover:shadow-neon font-mono"
                 >
                   CONNECT WALLET
                 </button>
