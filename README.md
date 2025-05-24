@@ -14,7 +14,7 @@
       +--------------------------------------------------------+
 ```
 
-## 🎯 The Classic Millionaire's Problem
+## 🎯 The Yao's Problem of Millionaire's Problem
 
 > "Two millionaires wish to know who is richer without revealing their actual wealth."
 >
@@ -40,6 +40,7 @@ Loom Video(Frontend):<https://www.loom.com/share/fd2ed32ef0e44b44b58c370562d9ba7
 #### Network Support
 
 - Tested on Sepolia Base network Contract Address: <https://sepolia.basescan.org/address/0x85111ef5328a16971048c78e349244e94cc1a81f>
+- Demo at <https://inco-task.vercel.app> make sure you have a web3 provider installed
 
 ### 🎭 Privacy Features
 
