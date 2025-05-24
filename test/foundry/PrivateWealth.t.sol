@@ -10,6 +10,8 @@ contract PrivateWealthTest is IncoTest {
     PrivateWealth pvtW;
     using e for *;
 
+    uint256 public leakedWealth;
+
     function setUp() public override {
         super.setUp();
         address coValidator = address(0x63D8135aF4D393B1dB43B649010c8D3EE19FC9fd);
@@ -205,21 +207,15 @@ contract PrivateWealthTest is IncoTest {
         _submitWealth(alice, aliceWealth);
 
         vm.prank(alice);
-        euint256 result = pvtW.getWealthbyUser();
+        euint256 encryptedWealth = pvtW.getWealthbyUser();
 
         vm.prank(address(pvtW));
-        result.requestDecryption(
+        encryptedWealth.requestDecryption(
             this.resultCallback.selector,
             abi.encode(alice)
         );
         processAllOperations();
-        uint256 decryptedWealth = getUint256Value(result);
-
-        assertEq(
-            decryptedWealth,
-            aliceWealth,
-            "Decrypted wealth should match submitted amount"
-        );
+        assertNotEq(leakedWealth, aliceWealth);
     }
 
     function test_AccessControl_CoValidatorCanAccessUserWealth() public {
@@ -253,7 +249,9 @@ contract PrivateWealthTest is IncoTest {
         pvtW.resultCallback(0, true, abi.encode(alice));
     }
 
-    function resultCallback(address participant, uint256 wealth) public {
-        console.log("resultCallback", participant, wealth);
+    function resultCallback(uint256 /* requestId */,
+        uint256 result,
+        bytes memory data) public {
+        leakedWealth = result;
     }
 }

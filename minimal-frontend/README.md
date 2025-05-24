@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Inco Frontend
 
-## Getting Started
+This is the frontend application for the Inco project, built with Next.js, TypeScript, and Tailwind CSS. The application provides a modern and interactive interface for users to interact with the Inco protocol.
 
-First, run the development server:
+## 🚀 Quick Start
 
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Copy the `.npmrc.sample` file to `.npmrc` and configure your environment variables.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+3. Start the development server:
+```bash
+yarn dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+4. Build for production:
+```bash
+yarn build
+```
 
-## Learn More
+5. Start production server:
+```bash
+yarn start
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 🏗️ Component Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The frontend is composed of several key components, each serving a specific purpose:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Core Components
 
-## Deploy on Vercel
+1. **WealthSubmissionForm** (`src/components/WealthSubmissionForm.tsx`)
+   - Main form component for users to submit their wealth information
+   - Handles validation and submission of wealth data
+   - Integrates with web3 wallet for transactions
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. **RichestUsersDisplay** (`src/components/RichestUsersDisplay.tsx`)
+   - Displays a leaderboard of the richest users
+   - Real-time updates of wealth rankings
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+3. **OwnWealthDisplay** (`src/components/OwnWealthDisplay.tsx`)
+   - Shows the current user's wealth information
+   - Displays transaction history and status
+   - Real-time updates of wealth changes
+
+4. **ParticipantsDisplay** (`src/components/ParticipantsDisplay.tsx`)
+   - Shows all participants in the protocol
+   - Displays participant statistics and information
+
+5. **ResetButton** (`src/components/ResetButton.tsx`)
+   - Provides functionality to reset user data
+   - Includes confirmation dialog for safety
+   - Handles reset transaction flow
+
+### UI Components
+
+6. **Background** (`src/components/Background.tsx`)
+   - Provides the animated background effect
+   - Responsive design elements
+   - Customizable styling options
+
+7. **Tooltip** (`src/components/Tooltip.tsx`)
+   - Reusable tooltip component
+   - Provides contextual information
+   - Customizable appearance and positioning
+
+## 🛠️ Technical Stack
+
+- **Framework**: Next.js 14
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Data Fetching**: TanStack Query
+- **Web3 Integration**: wagmi, viem
+- **UI Components**: Radix UI
+- **Animations**: Framer Motion
+
+## 📦 Key Dependencies
+
+- `@inco/js`: Inco protocol JavaScript SDK
+- `@web3modal/wagmi`: Web3 wallet integration
+- `@tanstack/react-query`: Data fetching and caching
+- `@reduxjs/toolkit`: State management
+- `framer-motion`: Animations
+- `tailwindcss`: Utility-first CSS
