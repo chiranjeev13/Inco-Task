@@ -3,7 +3,6 @@ pragma solidity ^0.8.28;
 
 import {e, ebool, euint256} from "@inco/lightning/src/Lib.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-
 contract PrivateWealth is Ownable {
     mapping(address => euint256) private participantWealth;
     mapping(address => bool) isCounted;
@@ -21,6 +20,7 @@ contract PrivateWealth is Ownable {
 
     function submitWealth(bytes memory eAmount) public {
         require(!isCounted[msg.sender], "Already Amount Added");
+        require(participants.length < 4, "Max participants reached");
         euint256 value = eAmount.newEuint256(msg.sender);
         value.allowThis();
         participantWealth[msg.sender] = value;
